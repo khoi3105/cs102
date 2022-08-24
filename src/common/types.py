@@ -16,7 +16,8 @@ class EntityType(enum.Enum):
     EMPTY = 0
     GROUND_A = 1
     GROUND_B = 2
-
+    GROUND_C = 3
+    
     PLAYER = 20
     SHADOW = 21
     NPC_CO_NGA = 22
@@ -47,7 +48,7 @@ class EntityType(enum.Enum):
     HP_HEART = 107
 
 
-OBSTACLES_TYPES = (EntityType.GROUND_A, EntityType.GROUND_B)
+OBSTACLES_TYPES = (EntityType.GROUND_A, EntityType.GROUND_B, EntityType.GROUND_C)
 FRIENDLY_NPC_TYPES = (EntityType.NPC_CO_NGA, EntityType.NPC_CHU_NAM, EntityType.NPC_CHU_NHAN)
 TRAMPOLINE_PART_TYPES = (EntityType.TRAMPOLINE_PART_SPRING, EntityType.TRAMPOLINE_PART_FRAME)
 

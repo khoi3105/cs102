@@ -1,0 +1,29 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from common import util
+from common.event import EventType, GameEvent
+from common.types import COLLECTABLE_TYPES
+from config import GameConfig
+
+if TYPE_CHECKING:
+    from worlds.world import World
+
+logger = util.get_logger(__name__)
+
+
+def event_handler(world: World) -> None:
+    """
+    Logics for ending bonus level 13.
+    """
+    needed_items_cnt = 6
+    if world.player.count_inventory(COLLECTABLE_TYPES) >= needed_items_cnt:
+        world.player.discard_inventory(COLLECTABLE_TYPES)
+        logger.info("Ending Level 13")
+        GameEvent(EventType.LEVEL_END).post()
+    #  logic if player fall -> restart level
+    if world.player.rect.y > GameConfig.HEIGHT:
+        world.player.discard_inventory(COLLECTABLE_TYPES)
+        logger.info("Restarting Level 13")
+        GameEvent(EventType.RESTART_LEVEL).post()
