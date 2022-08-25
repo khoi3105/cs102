@@ -28,8 +28,8 @@ class Color:
 
 
 class GameConfig:
-    DEBUG: bool = True
-    NAME: str = "STEAM Valley"
+    DEBUG: bool = False
+    NAME: str = "NDKhoi ls10-hw"
     FPS: int = 60
     WIDTH: int = 1248
     HEIGHT: int = 768

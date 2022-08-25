@@ -25,5 +25,5 @@ def event_handler(world: World) -> None:
     #  logic if player fall -> restart level
     if world.player.rect.y > GameConfig.HEIGHT:
         world.player.discard_inventory(COLLECTABLE_TYPES)
-        logger.info("Restarting Level 13")
+        logger.info("YOU DIED! Restarting Level 13")
         GameEvent(EventType.RESTART_LEVEL).post()
