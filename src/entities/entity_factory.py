@@ -8,11 +8,12 @@ from config import (
     NpcConfig,
     PlayerBulletConfig,
     PlayerConfig,
-    PlayerHpConfig,
     PlayerInventoryConfig,
     ShadowBossConfig,
     ShadowBulletConfig,
     ShadowConfig,
+    ShadowSuperBossBulletConfig,
+    ShadowSuperBossConfig,
     TrampolineConfig,
 )
 from entities.base_entity import BaseEntity
@@ -20,11 +21,12 @@ from entities.bullet import Bullet
 from entities.dialogue_box import DialogueBox
 from entities.friendly_npc import FriendlyNpc
 from entities.player import Player
-from entities.player_hp import PlayerHp
 from entities.player_inventory import PlayerInventory
+from entities.s_bullet import SuperBullet
 from entities.shadow import Shadow
 from entities.shadow_alpha import ShadowAlpha
 from entities.shadow_boss import ShadowBoss
+from entities.shadow_super_boss import ShadowSuperBoss
 from entities.trampoline import Trampoline
 from entities.trampoline_part import TrampolinePart
 
@@ -54,12 +56,6 @@ class EntityFactory:
                 sprite_path=PlayerConfig.SPRITE_PATH,
                 scale=PlayerConfig.SCALE,
                 animation_interval_ms=PlayerConfig.ANIMATION_INTERVAL_MS,
-            )
-        elif entity_type == EntityType.PLAYER_HP:
-            return PlayerHp(
-                entity_type=entity_type,
-                x=PlayerHpConfig.X,
-                y=PlayerHpConfig.Y,
             )
         elif entity_type == EntityType.PLAYER_INVENTORY:
             return PlayerInventory(
@@ -95,6 +91,19 @@ class EntityFactory:
                 speed=ShadowBulletConfig.SPEED,
                 damage=ShadowBulletConfig.DAMAGE,
             )
+        elif entity_type == EntityType.SUPERSHADOWBOSS_BULLET:
+            return SuperBullet(
+                entity_type=entity_type,
+                ttl_ms=ShadowSuperBossBulletConfig.TTL_MS,
+                x=x,
+                y=y,
+                init_dy=ShadowSuperBossBulletConfig.INIT_DY,
+                sprite_path=ShadowSuperBossBulletConfig.SPRITE_PATH,
+                scale=ShadowSuperBossBulletConfig.SCALE,
+                gravity=ShadowSuperBossBulletConfig.GRAVITY,
+                speed=ShadowSuperBossBulletConfig.SPEED,
+                damage=ShadowSuperBossBulletConfig.DAMAGE,
+            )
         elif entity_type == EntityType.SHADOW_ALPHA:
             return ShadowAlpha(
                 entity_type=entity_type,
@@ -127,7 +136,17 @@ class EntityFactory:
                 speed=ShadowBossConfig.SPEED,
                 damage=ShadowBossConfig.DAMAGE,
             )
-
+        elif entity_type == EntityType.SHADOW_SUPER_BOSS:
+            return ShadowSuperBoss(
+                entity_type=entity_type,
+                x=x,
+                y=y,
+                sprite_path=ShadowSuperBossConfig.SPRITE_PATH,
+                scale=ShadowSuperBossConfig.SCALE,
+                animation_interval_ms=ShadowSuperBossConfig.ANIMATION_INTERVAL_MS,
+                speed=ShadowSuperBossConfig.SPEED,
+                damage=ShadowSuperBossConfig.DAMAGE,
+            )
         elif entity_type in FRIENDLY_NPC_TYPES:
             config: NpcConfig = NpcConfig(entity_type=entity_type)
             return FriendlyNpc(

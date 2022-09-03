@@ -6,7 +6,7 @@ import pygame
 from pygame.font import Font
 from pygame.surface import Surface
 
-from config import DATA_DIR, FONT_PATH, Color, GameConfig, LevelLoadingBarConfig
+from config import DATA_DIR, FONT_PATH, Color, ASSET_DIR, GameConfig, LevelLoadingBarConfig
 
 logging.basicConfig(level=logging.DEBUG if GameConfig.DEBUG else logging.INFO)
 
@@ -65,6 +65,22 @@ def display_text(
         get_font(font_size).render(text, True, color),
         (x, y),
     )
+
+def display_background(
+    screen: Surface,
+    bg_name
+):
+    """
+    Given a screen background, display it on screen.
+    """
+    bg_path = ASSET_DIR / "backgrounds" / f"{bg_name}.png"
+    background = scale_image(
+            # call .convert() to improve performance, learn more:
+            # https://www.codeproject.com/Articles/5298051/Improving-Performance-in-Pygame-Speed-Up-Your-Game
+            pygame.image.load(bg_path).convert(),
+            (GameConfig.WIDTH, GameConfig.HEIGHT),
+        )
+    screen.blit(background, (0, 0))
 
 
 def draw_loading_bar(screen: Surface, loading_percent: int):

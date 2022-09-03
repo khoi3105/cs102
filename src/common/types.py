@@ -30,6 +30,7 @@ class EntityType(enum.Enum):
     TRAMPOLINE_PART_FRAME = 32
 
     SHADOW_BOSS = 40
+    SHADOW_SUPER_BOSS = 41
 
     # Collectable Items 60 -> 79
     CANDY = 60
@@ -44,9 +45,8 @@ class EntityType(enum.Enum):
     DIALOGUE_BOX = 102
     PLAYER_BULLET = 103
     SHADOW_BULLET = 104
-    PLAYER_HP = 105
+    SUPERSHADOWBOSS_BULLET = 105
     PLAYER_INVENTORY = 106
-    HP_HEART = 107
 
 
 OBSTACLES_TYPES = (EntityType.GROUND_A, EntityType.GROUND_B)
@@ -59,7 +59,7 @@ COLLECTABLE_TYPES = (
     EntityType.CANDY,
 ) + TRAMPOLINE_PART_TYPES
 
-FIXED_POSITION_TYPES = (EntityType.DIALOGUE_BOX, EntityType.PLAYER_HP, EntityType.PLAYER_INVENTORY)
+FIXED_POSITION_TYPES = (EntityType.DIALOGUE_BOX, EntityType.PLAYER_INVENTORY)
 
 
 class QuestName(enum.Enum):

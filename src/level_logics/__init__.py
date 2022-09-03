@@ -8,10 +8,11 @@ Refer to one.py to write your own levels and stories.
 """
 from typing import Callable, Optional
 
-from level_logics import one, twelve
+from level_logics import one, three, twelve
 
 _HANDLERS = {
     1: one.event_handler,
+    3: three.event_handler,
     12: twelve.event_handler,
 }
 

@@ -20,20 +20,21 @@ class ShadowBoss(Shadow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.initial_hp = ShadowBossConfig.INITIAL_HP
-        self.hp = self.initial_hp
-        self.recent_action_started_at[ActionType.ANGRY] = now()
+        self.hp = ShadowBossConfig.INITIAL_HP
+        self.is_angry = False
+        self.last_angry_t = now()
 
-    def _update_action(self):
-        if self.set_action(
-            ActionType.ANGRY,
-            duration_ms=ShadowBossConfig.ANGRY_DURATION_MS,
-            interval_ms=ShadowBossConfig.ANGRY_INTERVAL_MS,
-        ):
-            self._get_angry()
-        super()._update_action()
+    def update(self, screen, *args, **kwargs) -> None:
+        super().update(screen, *args, **kwargs)
 
-    def _get_angry(self):
+        # Boss Angry
+        if now() - self.last_angry_t > ShadowBossConfig.ANGRY_INTERVAL_MS:
+            self.is_angry = True
+            self.last_angry_t = now()
+            self.set_action(ActionType.ANGRY, duration_ms=ShadowBossConfig.ANGRY_DURATION_MS)
+            self._shoot_bullet()
+
+    def _shoot_bullet(self):
         for _ in range(10):
             bullet_id = self.world.add_entity(
                 EntityType.SHADOW_BULLET,
@@ -47,6 +48,8 @@ class ShadowBoss(Shadow):
     def _take_damage(self, damage: int):
         self.hp -= damage
         self.start_hurt(duration_ms=ShadowBossConfig.HURT_DURATION_MS)
+        if self.hp <= 0:
+            self.die()
 
     def _handle_get_hit(self):
         bullet: Bullet
@@ -59,9 +62,6 @@ class ShadowBoss(Shadow):
 
                 self._take_damage(bullet.damage)
 
-                if self.hp <= 0:
-                    self.die()
-
     def render(self, screen, *args, **kwargs) -> None:
         super().render(screen, *args, **kwargs)
 
@@ -69,7 +69,7 @@ class ShadowBoss(Shadow):
         if self.hp > 0:
             util.display_text(
                 screen,
-                f"{self.hp} / 100",
+                f"{self.hp} / {ShadowBossConfig.INITIAL_HP}",
                 x=self.rect.x,
                 y=self.rect.top + self.HP_TEXT_HEIGHT_OFFSET,
                 color=Color.BOSS_HP_BAR,
@@ -77,7 +77,7 @@ class ShadowBoss(Shadow):
 
             util.draw_pct_bar(
                 screen,
-                fraction=self.hp / self.initial_hp,
+                fraction=self.hp / ShadowBossConfig.INITIAL_HP,
                 x=self.rect.x,
                 y=self.rect.y - self.HP_BAR_HEIGHT,
                 width=self.rect.width,
@@ -88,4 +88,5 @@ class ShadowBoss(Shadow):
 
     def __del__(self):
         if self.hp <= 0:
-            GameEvent(EventType.VICTORY).post()
+            GameEvent(EventType.BOSS1_DIE,sender_type=self.entity_type).post()
+            

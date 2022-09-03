@@ -24,19 +24,21 @@ class EventType(enum.Enum):
     RESTART_LEVEL = pygame.event.custom_type()
     LEVEL_END = pygame.event.custom_type()
     VICTORY = pygame.event.custom_type()
+    DEAD_BY_FALL = pygame.event.custom_type()
 
     JUMP = pygame.event.custom_type()
     HURT = pygame.event.custom_type()
     FALL = pygame.event.custom_type()
     DIE = pygame.event.custom_type()
     COLLECT_ITEM = pygame.event.custom_type()
+    BOSS_DIE = pygame.event.custom_type()
+    BOSS1_DIE = pygame.event.custom_type()
 
     PLAYER_NEAR_NPC = pygame.event.custom_type()
     PLAYER_ACTIVATE_NPC = pygame.event.custom_type()
     NPC_DIALOGUE_END = pygame.event.custom_type()
     QUEST_START = pygame.event.custom_type()
     QUEST_END = pygame.event.custom_type()
-    BOSS_DIE = pygame.event.custom_type()
 
 
 class GameEvent:

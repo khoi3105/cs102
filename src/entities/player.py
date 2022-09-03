@@ -8,7 +8,7 @@ from common import util
 from common.event import EventType, GameEvent
 from common.types import ActionType, EntityType
 from common.util import now
-from config import GameConfig, PlayerConfig, TrampolineConfig
+from config import GameConfig, PlayerConfig, PlayerHpConfig, TrampolineConfig
 from entities.animated_entity import AnimatedEntity
 from entities.friendly_npc import FriendlyNpc
 from entities.trampoline import Trampoline
@@ -30,11 +30,9 @@ class Player(AnimatedEntity):
         self.talking: bool = False
         self.inventory: List = []
         self.inventory_entity_id: Optional[int] = None
-        self.hp: int = PlayerConfig.INITIAL_HP
-        self.max_hp: int = PlayerConfig.INITIAL_HP
-        self.hp_entity_id: Optional[int] = None
-
-        self.last_hit_t: int = 0
+        self.hp = PlayerConfig.MAX_HP
+        self.last_hit_t = now()
+        self.last_shoot_burget = now()
 
     def get_x_y_w_h(self) -> tuple:
         """Slightly narrow down the Player rectangle since the head is too big."""
@@ -52,14 +50,35 @@ class Player(AnimatedEntity):
         self._maybe_jump_with_trampoline()
 
         # Manage the dependent entities.
-        self._update_hp_entity()
         self._update_inventory_entity()
-
         self._handle_get_hit()
+
+        if self.rect.y > GameConfig.HEIGHT + 100:
+            GameEvent(EventType.DEAD_BY_FALL).post()
+
+    def _handle_get_hit(self) -> None:
+        for s_bullet in self.world.get_entities(EntityType.SHADOW_BULLET):
+            if self.collide(s_bullet):
+                self.world.remove_entity(s_bullet.id)
+                self._take_damage(s_bullet.damage)
+
+        for shadow in self.world.get_entities(EntityType.SHADOW):
+            if self.collide(shadow):
+                self._take_damage(1)
+
+        for s_bullet in self.world.get_entities(EntityType.SUPERSHADOWBOSS_BULLET):
+            if self.collide(s_bullet):
+                self.world.remove_entity(s_bullet.id)
+                self._take_damage(s_bullet.damage)        
+
+    def _take_damage(self, damage: int) -> None:
+        if now() - self.last_hit_t > PlayerConfig.INVULNERABLE_DURATION_MS:
+            self.last_hit_t = now()
+            self.hp -= damage
+            self.stop()
+            self.start_hurt(duration_ms=PlayerConfig.INVULNERABLE_DURATION_MS)
+
         if self.hp <= 0:
-            self.die()
-        if self.rect.top > GameConfig.HEIGHT:
-            GameEvent(EventType.FALL, sender_type=self.entity_type).post()
             self.die()
 
     def count_inventory(self, entity_types: Iterable[EntityType] = tuple()) -> int:
@@ -82,17 +101,6 @@ class Player(AnimatedEntity):
             entity for entity in self.inventory if entity.entity_type not in entity_types
         ]
 
-    def _update_hp_entity(self):
-        """
-        This Player entity directly manages a PlayerHp entity.
-        """
-        # Cap the HP to self.max_hp
-        self.hp = min(self.hp, self.max_hp)
-
-        if not self.hp_entity_id:
-            self.hp_entity_id = self.world.add_entity(EntityType.PLAYER_HP)
-        self.world.get_entity(self.hp_entity_id).set_hp(self.max_hp, self.hp)
-
     def _update_inventory_entity(self):
         """
         This Player entity directly manages a PlayerInventory entity.
@@ -107,8 +115,8 @@ class Player(AnimatedEntity):
         """
         for event in self.events:
 
-            # Only allow player to move when NOT being hurt / NOT talking to some NPC.
-            if not self.talking and not self.is_hurting:
+            # Only allow player to move when NOT talking to some NPC.
+            if not self.talking:
                 if event.is_key_down(pygame.K_LEFT, pygame.K_a):
                     self.move_left(True)
                 elif event.is_key_down(pygame.K_RIGHT, pygame.K_d):
@@ -165,39 +173,21 @@ class Player(AnimatedEntity):
         Set it motions to go left or right depending on the facing of Player.
         :return:
         """
-        self.set_action(ActionType.THROW, duration_ms=PlayerConfig.THROW_DURATION_MS)
-        ball_id = self.world.add_entity(
-            EntityType.PLAYER_BULLET,
-            self.rect.centerx,
-            self.rect.centery - 30,
-        )
-        ball = self.world.get_entity(ball_id)
-        if self.get_flip_x():
-            ball.move_left()
-        else:
-            ball.move_right()
+        if now() - self.last_shoot_burget > PlayerConfig.COOLDOWN_SHOOT:
+            self.set_action(ActionType.THROW, duration_ms=PlayerConfig.THROW_DURATION_MS)
+            ball_id = self.world.add_entity(
+                EntityType.PLAYER_BULLET,
+                self.rect.centerx,
+                self.rect.centery - 30,
+            )
+            ball = self.world.get_entity(ball_id)
+            if self.get_flip_x():
+                ball.move_left()
+            else:
+                ball.move_right()
 
-    def _handle_get_hit(self):
-        for bullet in self.world.get_entities(EntityType.SHADOW_BULLET):
-            if self.collide(bullet):
-                self.world.remove_entity(bullet.id)
-                self._take_damage(bullet.damage)
-
-        for shadow in self.world.get_entities(EntityType.SHADOW):
-            if self.collide(shadow):
-                self._take_damage(shadow.damage)
-
-    def _take_damage(self, damage: int):
-        now_ms = now()
-        if now_ms - self.last_hit_t < PlayerConfig.INVULNERABLE_DURATION_MS:
-            return
-        else:
-            self.stop()
-            self.start_hurt(duration_ms=PlayerConfig.HURT_DURATION_MS)
-            self.last_hit_t = now_ms
-            logger.debug(f"Player HP: {self.hp} -> {self.hp - damage}")
-            self.hp -= damage
-
+            self.last_shoot_burget = now()
+            
     def _update_screen_offset(self):
         """Logics for horizontal world scroll based on player movement"""
         delta_screen_offset = 0
@@ -227,3 +217,18 @@ class Player(AnimatedEntity):
                     ActionType.ANIMATE, duration_ms=TrampolineConfig.ANIMATION_DURATION_MS
                 )
                 self.jump_with_trampoline()
+
+    def render(self, screen: pygame.Surface, *args, **kwargs):
+        super().render(screen, *args, **kwargs)
+
+        for i in range(0, PlayerConfig.MAX_HP):
+            if i < self.hp:
+                screen.blit(
+                    pygame.image.load(PlayerHpConfig.FULL_HEART_PATH),
+                    (PlayerHpConfig.X + i * PlayerHpConfig.X_STEP, PlayerHpConfig.Y),
+                )
+            else:
+                screen.blit(
+                    pygame.image.load(PlayerHpConfig.EMPTY_HEART_PATH),
+                    (PlayerHpConfig.X + i * PlayerHpConfig.X_STEP, PlayerHpConfig.Y),
+                )

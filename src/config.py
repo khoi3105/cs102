@@ -75,13 +75,16 @@ class PlayerConfig:
     JUMP_WITH_TRAMPOLINE_SPEED: int = 40
     # minimal time until switching to the next sprite in sequence
     ANIMATION_INTERVAL_MS: int = 70 * 60 // GameConfig.FPS
-    INITIAL_HP: int = 3
     INVULNERABLE_DURATION_MS: int = 1000
 
     HURT_DURATION_MS: int = 80 * 4
 
     # TODO: we have 7 sprites for ActionType.THROW but only use 2-3 now
     THROW_DURATION_MS: int = 170 * 60 // GameConfig.FPS
+
+    MAX_HP: int = 3
+
+    COOLDOWN_SHOOT : int = 1000
 
 
 class PlayerHpConfig:
@@ -132,13 +135,25 @@ class ShadowBossConfig:
     ANIMATION_INTERVAL_MS: int = 200
     SPEED: int = 1
     DAMAGE: int = 1
-    INITIAL_HP: int = 100
+    INITIAL_HP: int = 50
 
     ANGRY_INTERVAL_MS: int = 7000
     ANGRY_DURATION_MS: int = 2000
 
     HURT_DURATION_MS: int = 500
 
+class ShadowSuperBossConfig:
+    SPRITE_PATH: Path = ASSET_DIR / "npcs" / "shadow"
+    SCALE: float = 0.8
+    ANIMATION_INTERVAL_MS: int = 200
+    SPEED: int = 1
+    DAMAGE: int = 1
+    INITIAL_HP: int = 250
+
+    ANGRY_INTERVAL_MS: int = 3500
+    ANGRY_DURATION_MS: int = 2000
+
+    HURT_DURATION_MS: int = 500
 
 class ShadowBulletConfig:
     SPRITE_PATH: Path = ASSET_DIR / "items" / "shadow_bullet.png"
@@ -149,6 +164,19 @@ class ShadowBulletConfig:
 
     # initial vertical movement
     INIT_DY: int = -15
+
+    # the time between creation and deletion of entities of this type
+    TTL_MS: int = 3000
+
+class ShadowSuperBossBulletConfig:
+    SPRITE_PATH: Path = ASSET_DIR / "items" / "lazer.png"
+    SCALE: float = 0.05
+    SPEED: int = 5
+    GRAVITY: int = 0
+    DAMAGE: int = 1
+
+    # initial vertical movement
+    INIT_DY: int = -20
 
     # the time between creation and deletion of entities of this type
     TTL_MS: int = 3000

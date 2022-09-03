@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Sequence
 
 from common import util
 from common.event import EventType, GameEvent
+from common.types import EntityType
 from entities.base_entity import BaseEntity
 
 if TYPE_CHECKING:
@@ -49,6 +50,7 @@ class MovableEntity(BaseEntity):
         # minimal time until switching to next sprite
         self.animation_interval_ms: int = animation_interval_ms
         self.last_animation_ms: int = 0
+
 
     def update(self, events: Sequence[GameEvent], world: World) -> None:
         super().update(events, world)
@@ -105,6 +107,12 @@ class MovableEntity(BaseEntity):
         else:
             self.move_right()
 
+    def move_to_player(self,player_x):
+        if player_x < self.rect.x:
+            self.move_left()
+        else:
+            self.move_right()
+
     def jump(self):
         if self.is_landed:
             self.is_landed = False
@@ -126,6 +134,8 @@ class MovableEntity(BaseEntity):
         """
         # The obstacle check in the following for loop will determine
         # whether the subject is_landed, so we first reset it.
+        if self.entity_type == EntityType.SHADOW_SUPER_BOSS:
+            pass
         self.is_landed = False
         for obstacle in obstacles:
             x, y, w, h = self.get_x_y_w_h()
