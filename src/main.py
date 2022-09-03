@@ -51,4 +51,9 @@ Changelog:
 - Boss can teleport to player when shoot hamburger to increase accuracy
 - Add new scene (fell), add background for victory scene
 - Change background and ground-block for level 3
+- Changed player hp to 4
+- When normal boss died, superboss will appear
+
+Tips:
+- Su dung trampoline de tranh lazer 
 """
