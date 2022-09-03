@@ -29,13 +29,13 @@ class SuperBullet(MovableEntity):
             self.got_player_rect = True
             self.player_rect = self._get_player_rect()
             self.player_x = self.player_rect.x
-            self.player_y = self.player_rect.y
+            self.player_y = self.player_rect.y - 30
 
             # tinh toan so step de khi tang, x y dat toi player
 
             self.dx = abs(self.rect.x - self.player_x) / 24
             self.abc = self.dx
-            self.dy = abs(self.rect.y - self.player_y) / 30
+            self.dy = abs(self.rect.y - self.player_y - 30) / 30
 
             if not self.rect.x < self.player_x:
                 self.dx = -self.dx
@@ -48,7 +48,6 @@ class SuperBullet(MovableEntity):
 
         self.dx = self.abc
         self.rect.x += self.dx
-        print(self.dx, self.dy)
         self.rect.y += self.dy
 
     def _get_player_rect(self):

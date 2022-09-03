@@ -82,9 +82,9 @@ class PlayerConfig:
     # TODO: we have 7 sprites for ActionType.THROW but only use 2-3 now
     THROW_DURATION_MS: int = 170 * 60 // GameConfig.FPS
 
-    MAX_HP: int = 3
+    MAX_HP: int = 4
 
-    COOLDOWN_SHOOT : int = 1000
+    COOLDOWN_SHOOT : int = 150
 
 
 class PlayerHpConfig:
