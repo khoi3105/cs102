@@ -43,3 +43,12 @@ class GameManager:
 if __name__ == "__main__":
     game_manager = GameManager()
     game_manager.run()
+
+
+"""
+Changelog:
+- Add new boss bullet: lazer, which can follow player
+- Boss can teleport to player when shoot hamburger to increase accuracy
+- Add new scene (fell), add background for victory scene
+- Change background and ground-block for level 3
+"""

@@ -14,4 +14,4 @@ def event_handler(world: World) -> None:
     """
     for e in world.events:
         if e.is_type(EventType.BOSS1_DIE) and e.get_sender_type() == EntityType.SHADOW_BOSS:
-            Second_Boss = world.add_entity(EntityType.SHADOW_SUPER_BOSS, 500, 150)
+            Second_Boss = world.add_entity(EntityType.SHADOW_SUPER_BOSS, 500, 25)
